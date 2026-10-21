@@ -35,6 +35,9 @@ npx wrangler pages deploy . --project-name manhwa-midterm
 3. Cloudflare → Security → WAF → Rate limiting rules에서 `/api/ai` 경로에 IP당 분당 20회 정도 제한 걸기.
 4. 키를 이 폴더 파일이나 깃에 절대 적지 않기.
 
+## 진단
+배포 후 `https://내주소/api/health?key=접속비밀번호` 를 열면 설정과 게이트웨이 응답을 그대로 보여줘요.
+
 ## 안 될 때
 - 화면에 "서버에 API 키가 설정되지 않았어요" → `AI_API_KEY`·`AI_MODEL` 확인, 또는 게이트웨이가 키를 거절함(401/403).
 - 계속 "연결이 끊겼어요" → 게이트웨이 주소와 경로 확인. 다른 형식이면 `AI_BASE_URL`·`AI_PATH`로 맞추기.

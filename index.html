@@ -1388,7 +1388,9 @@ async function callAI(messages, opts={}, retried=false){
   try{ r=await fetch("/api/ai",{method:"POST",headers:{"content-type":"application/json","x-access-key":key},body:JSON.stringify({messages}),signal:opts.signal}); }
   catch(e){ throw {code:e?.name==="AbortError"?"cancelled":"upstream_error",message:String(e)}; }
   if(r.status===401){ store.set("pw",""); if(retried) throw {code:"bad_password"}; const k=await askPassword(true); if(!k) throw {code:"not_granted"}; store.set("pw",k); return callAI(messages,opts,true); }
-  if(!r.ok){ let j={}; try{j=await r.json()}catch(e){} throw {code:j.code||"upstream_error",message:j.detail||""}; }
+  if(!r.ok){ let j={}; try{j=await r.json()}catch(e){} throw {code:j.code||"upstream_error",message:j.detail||"",detail:(j.detail||("HTTP "+r.status)).slice(0,200)}; }
+  const ctype=r.headers.get("content-type")||"";
+  if(!ctype.includes("event-stream")){ let j={}; try{j=await r.json()}catch(e){} const t=j.choices?.[0]?.message?.content||""; if(!t.trim()) throw {code:"empty_completion",detail:JSON.stringify(j).slice(0,200)}; opts.onText&&opts.onText({text:t,delta:t}); return {text:t,truncated:false}; }
   const reader=r.body.getReader(), dec=new TextDecoder(); let buf="", text="";
   try{
     for(;;){
@@ -1398,12 +1400,12 @@ async function callAI(messages, opts={}, retried=false){
       for(const line of lines){
         const t=line.trim(); if(!t.startsWith("data:")) continue;
         const d=t.slice(5).trim(); if(d==="[DONE]") continue;
-        try{ const j=JSON.parse(d); const delta=j.choices?.[0]?.delta?.content ?? j.choices?.[0]?.message?.content ?? "";
-          if(delta){ text+=delta; opts.onText&&opts.onText({text,delta}); } }catch(e){}
+        try{ const j=JSON.parse(d); if(j.error) throw {code:"upstream_error",detail:(j.error.message||JSON.stringify(j.error)).slice(0,200)}; const delta=j.choices?.[0]?.delta?.content ?? j.choices?.[0]?.message?.content ?? "";
+          if(delta){ text+=delta; opts.onText&&opts.onText({text,delta}); } }catch(e){ if(e&&e.code) throw e; }
       }
     }
-  }catch(e){ throw {code:e?.name==="AbortError"?"cancelled":"upstream_error",text:text||undefined}; }
-  if(!text.trim()) throw {code:"empty_completion"};
+  }catch(e){ if(e&&e.code) throw {...e,text:text||undefined}; throw {code:e?.name==="AbortError"?"cancelled":"upstream_error",text:text||undefined,detail:"응답 도중 끊김"}; }
+  if(!text.trim()) throw {code:"empty_completion",detail:"게이트웨이가 빈 답을 보냄 (모델 이름·스트리밍 지원 확인)"};
   return {text,truncated:false};
 }
 function parseJSONLoose(t){
@@ -1429,7 +1431,7 @@ const ERR = {
  bad_password:"비밀번호가 틀렸어요. 다시 눌러서 입력해 주세요.",
  not_configured:"서버에 API 키가 설정되지 않았어요. Cloudflare 시크릿을 확인하세요."
 };
-const errMsg = e => ERR[e?.code] || ERR.upstream_error;
+const errMsg = e => (ERR[e?.code] || ERR.upstream_error) + (e?.detail?` [원인: ${String(e.detail).slice(0,200)}]`:"");
 const NOAI = "AI 서버에 연결하지 못했어요.";
 
 async function explain(q, picked, out, btn){
