@@ -40,3 +40,6 @@ Cloudflare에서 프로젝트를 **Workers**로 만들었는지 **Pages**로 만
 2. `ACCESS_PASSWORD` 꼭 설정하기
 3. Security → WAF → Rate limiting으로 `/api/ai`에 IP당 분당 20회 정도 제한
 4. 키를 파일이나 깃에 절대 적지 않기
+
+## 작품 사진
+`public/img/`의 사진은 Wikimedia Commons에서 받았어요. 사진을 누르면 원본 파일 페이지(작가·저작권 정보) 링크가 보여요.
