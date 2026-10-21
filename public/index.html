@@ -119,7 +119,16 @@ td:first-child{font-weight:700}
 .tcard dl > div.warn dt{color:var(--warn)}
 .tcard dl > div.warn dd{color:var(--ink)}
 .tcard dl > div.warn{border-left:3px solid var(--warn);padding-left:10px}
-.tcards + ul.pts, ul.pts + .tcards{margin-top:20px}
+.tcards + ul.pts, ul.pts + .tcards, .attrs + ul.pts, ul.pts + .attrs{margin-top:20px}
+.attrs{display:flex;flex-direction:column;gap:10px;margin-top:4px}
+.attr{border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.attr h4{margin:0;padding:8px 14px;background:var(--sunk);font-size:.86rem;font-weight:900;color:var(--ink-2)}
+.attr dl{margin:0;display:grid;grid-template-columns:max-content 1fr}
+.attr dt,.attr dd{padding:9px 14px;border-top:1px solid var(--line);margin:0;line-height:1.6}
+.attr dl > dt:first-of-type,.attr dl > dt:first-of-type + dd{border-top:0}
+.attr dt{font-weight:700;font-size:.9rem;color:var(--ink);white-space:nowrap;padding-right:6px}
+.attr dd{font-size:.95rem;color:var(--ink)}
+@media (max-width:640px){.attr dt{white-space:normal;max-width:7.5em;font-size:.84rem}.attr dt,.attr dd{padding:8px 12px}}
 /* 칩 */
 .chips{display:flex;gap:8px;padding:2px 28px 4px 2px}
 .chip{flex:0 0 auto;scroll-snap-align:start;font:700 .9rem var(--f-body);border:1px solid var(--line);background:var(--panel);color:var(--ink-2);
@@ -1057,7 +1066,8 @@ function tableHTML(rows){
   const warnCol = h => /한계|다른 점|다른점|주의/.test(strip(h||""));
   // 첫 머리칸이 비어 있으면 '항목 × 대상' 표 → 대상(열)마다 카드
   if(strip(head[0])===""){
-    return `<div class="tcards">${head.slice(1).map((name,j)=>`<div class="tcard"><h4>${name}</h4><dl>${body.map(r=>`<div><dt>${r[0]}</dt><dd>${r[j+1]}</dd></div>`).join("")}</dl></div>`).join("")}</div>`;
+    // 항목(행)마다 묶고, 그 안에서 대상끼리 줄 맞춰 비교
+    return `<div class="attrs">${body.map(r=>`<section class="attr"><h4>${r[0]}</h4><dl>${head.slice(1).map((name,j)=>`<dt>${name}</dt><dd>${r[j+1]}</dd>`).join("")}</dl></section>`).join("")}</div>`;
   }
   // 칸이 많거나 글이 길면 행마다 카드
   if(head.length>=4 || avg>=16){
