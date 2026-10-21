@@ -347,6 +347,10 @@ select.enh{position:absolute;opacity:0;pointer-events:none;width:1px;height:1px}
 
 .tipbar{margin:12px 18px 0;border:1px dashed color-mix(in srgb,var(--accent) 55%,transparent);background:var(--accent-soft);color:var(--ink);border-radius:10px;padding:10px 12px;font-size:.86rem;line-height:1.6}
 .tipbar b{color:var(--accent)}
+.tipbar{display:flex;gap:10px;align-items:flex-start}
+.tipbar span{flex:1;min-width:0}
+.tipx{flex:0 0 auto;width:28px;height:28px;margin:-4px -4px 0 0;border:0;border-radius:50%;background:transparent;color:var(--ink-3);font-size:.9rem;cursor:pointer}
+.tipx:hover{background:var(--panel);color:var(--ink)}
 @media (max-width:640px){.tipbar,.ctxbar{margin-inline:16px}
   .seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;width:100%;border-radius:12px}
   .seg button{padding:9px 6px;font-size:.84rem;border-radius:9px;line-height:1.3}}
@@ -1682,8 +1686,12 @@ function currentContext(){
 }
 let lastFocus=null;
 function renderTip(){
+  const bar=$("#tipBar");
+  if(store.get("tipClosed",false)){ bar.hidden=true; return; }
   const m=matchMedia("(max-width:640px)").matches;
-  $("#tipBar").innerHTML=`<b>바로 묻기</b> 요약이나 문제에서 모르는 글자를 ${m?"꾹 눌러 선택":"마우스로 드래그"}하면 <b>‘이 부분 AI에게 묻기’</b> 버튼이 떠요. 지금 보는 화면 내용은 자동으로 함께 보내져요.`;
+  bar.hidden=false;
+  bar.innerHTML=`<span><b>바로 묻기</b> 요약이나 문제에서 모르는 글자를 ${m?"꾹 눌러 선택":"마우스로 드래그"}하면 <b>‘이 부분 AI에게 묻기’</b> 버튼이 떠요. 지금 보는 화면 내용은 자동으로 함께 보내져요.</span><button class="tipx" aria-label="안내 닫기">✕</button>`;
+  bar.querySelector(".tipx").onclick=()=>{ store.set("tipClosed",true); bar.hidden=true; };
 }
 function openDrawer(opts={}){
   lastFocus=document.activeElement; renderTip();
