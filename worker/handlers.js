@@ -99,9 +99,10 @@ export async function handleHealth(request, env) {
       headers: { "content-type": "application/json", authorization: "Bearer " + env.AI_API_KEY },
       body: JSON.stringify({ model: env.AI_MODEL, messages: [{ role: "user", content: "OK라고만 답해" }], max_tokens: 20 }),
     });
-    const body = (await up.text()).slice(0, 600);
+    const full = await up.text();
+    const body = full.slice(0, 600);
     let answer = null;
-    try { answer = JSON.parse(body).choices?.[0]?.message?.content ?? null; } catch {}
+    try { answer = JSON.parse(full).choices?.[0]?.message?.content ?? null; } catch {}
     return json(up.ok && answer ? 200 : 502, {
       ok: up.ok && !!answer,
       ...report,
