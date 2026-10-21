@@ -350,6 +350,10 @@ select.enh{position:absolute;opacity:0;pointer-events:none;width:1px;height:1px}
 .tipbar{display:flex;gap:10px;align-items:flex-start}
 .tipbar span{flex:1;min-width:0}
 .tipx{flex:0 0 auto;width:28px;height:28px;margin:-4px -4px 0 0;border:0;border-radius:50%;background:transparent;color:var(--ink-3);font-size:.9rem;cursor:pointer}
+.quotebar{display:flex;gap:8px;align-items:flex-start;background:var(--accent-soft);border-left:3px solid var(--accent);border-radius:0 10px 10px 0;padding:8px 10px}
+.quotebar > div{flex:1;min-width:0}
+.quotebar .qlabel{font-size:.74rem;font-weight:700;color:var(--accent)}
+.quotebar .qtext{font-size:.88rem;line-height:1.55;color:var(--ink);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .tipx:hover{background:var(--panel);color:var(--ink)}
 @media (max-width:640px){.tipbar,.ctxbar{margin-inline:16px}
   .seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;width:100%;border-radius:12px}
@@ -528,6 +532,7 @@ textarea::placeholder{color:var(--ink-3)}
   <div class="chat" id="chat" aria-live="polite"></div>
   <div class="dfoot">
     <div class="chips hscroll" id="sugg"></div>
+    <div class="quotebar" id="quoteBar" hidden></div>
     <div class="chatin"><textarea id="askIn" placeholder="모르는 걸 물어보세요" rows="1"></textarea><button class="btn pri sendbtn" id="askBtn" aria-label="보내기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
     <div class="row" style="justify-content:space-between;align-items:center"><span class="status" id="askStatus" style="margin:0"></span><button class="btn sm" id="askStop" hidden>멈추기</button></div>
   </div>
@@ -1657,8 +1662,20 @@ $("#esModel").onclick=()=>essayCall("model");
 /* ================= AI 질문 드로어 ================= */
 const SUGG = ["이 부분 시험에 어떻게 나와?","헷갈리는 짝만 정리해줘","확인·기록·해석 구분 연습","즉석 퀴즈 3개","3주차 퀴즈 vs 자료 충돌","7주차 연도만"];
 let turns = store.get("turns2",[]); let askCtl=null; let ctx=null; // ctx={label,text}
-$("#sugg").innerHTML = SUGG.map(s=>`<button class="chip">${s}</button>`).join("");
-$("#sugg").querySelectorAll("button").forEach(b=>b.onclick=()=>{$("#askIn").value=b.textContent;ask()});
+const QUOTE_SUGG = ["쉽게 설명해줘","시험에 어떻게 나와?","헷갈리는 개념이랑 비교해줘","예시로 설명해줘","한 줄로 외우는 법"];
+let pendingQuote="";
+function renderSugg(){
+  const list = pendingQuote?QUOTE_SUGG:SUGG;
+  $("#sugg").innerHTML = list.map(s=>`<button class="chip">${s}</button>`).join("");
+  $("#sugg").querySelectorAll("button").forEach(b=>b.onclick=()=>{$("#askIn").value=b.textContent;ask()});
+  const qb=$("#quoteBar");
+  if(!pendingQuote){ qb.hidden=true; $("#askIn").placeholder="모르는 걸 물어보세요"; return; }
+  qb.hidden=false;
+  qb.innerHTML=`<div><div class="qlabel">선택한 부분</div><div class="qtext">${esc(pendingQuote)}</div></div><button class="tipx" aria-label="선택 취소">✕</button>`;
+  qb.querySelector("button").onclick=()=>{pendingQuote="";renderSugg()};
+  $("#askIn").placeholder="이 부분에 대해 뭘 물어볼까요? (위 버튼도 가능)";
+}
+renderSugg();
 function renderChat(){
   const c=$("#chat");
   c.innerHTML = turns.length? turns.map(t=>`<div class="bub ${t.role==="user"?"me":"ai"}">${t.role==="user"?(t.quote?`<span class="quote">${esc(t.quote)}</span>`:"")+esc(t.show??t.content):md(t.content)}</div>`).join("")
@@ -1697,7 +1714,9 @@ function openDrawer(opts={}){
   lastFocus=document.activeElement; renderTip();
   $("#drawer").hidden=false; $("#scrim").hidden=false; $("#fab").hidden=true; hideSelAsk();
   ctx = opts.ctx!==undefined?opts.ctx:currentContext(); renderCtx(); renderChat();
-  if(opts.send){ $("#askIn").value=opts.send.text; ask(opts.send.quote); }
+  if(opts.quote!==undefined){ pendingQuote=opts.quote; }
+  renderSugg();
+  if(opts.send){ $("#askIn").value=opts.send.text; ask(); }
   else setTimeout(()=>$("#askIn").focus({preventScroll:true}),50);
 }
 function closeDrawer(){ $("#drawer").hidden=true; $("#scrim").hidden=true; $("#fab").hidden=false; lastFocus?.focus?.({preventScroll:true}); }
@@ -1719,8 +1738,9 @@ ${QUIZ.map(qLine).join("\n")}
 
 수업 자료:
 ${WEEKS.map(weekText).join("\n")}`;
-async function ask(quote){
+async function ask(){
   const v=$("#askIn").value.trim(); if(!v) return;
+  const quote=pendingQuote; pendingQuote=""; renderSugg();
   const sample=await getSample(); const st=$("#askStatus");
   if(!sample){st.className="status err";st.textContent=NOAI;return;}
   const full = (ctx&&ctx.text?`[학생이 지금 보고 있는 부분: ${ctx.label}]\n${ctx.text}\n\n`:"")+(quote?`[학생이 드래그한 부분]\n"${quote}"\n\n`:"")+"질문: "+v;
@@ -1767,7 +1787,7 @@ document.addEventListener("mouseup",e=>{ if(!e.target.closest("#selAsk")) checkS
 document.addEventListener("touchend",checkSel,{passive:true});
 $("#selAsk").addEventListener("mousedown",e=>e.preventDefault());
 $("#selAsk").onclick=()=>{ const q=selText; hideSelAsk(); getSelection()?.removeAllRanges();
-  openDrawer({send:{text:"이 부분 모르겠어. 쉽게 설명하고 시험에 어떻게 나올지도 알려줘.",quote:q}}); };
+  openDrawer({quote:q}); };
 
 /* ================= 드롭다운 ================= */
 const CHEV='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg>';
