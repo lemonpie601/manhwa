@@ -382,6 +382,8 @@ textarea::placeholder{color:var(--ink-3)}
 .esq{background:var(--sunk);border-radius:10px;padding:14px 16px;font-size:1rem;line-height:1.75;font-weight:500;color:var(--ink)}
 .esq .wk{display:inline-block;font-size:.76rem;font-weight:700;color:var(--accent);background:var(--accent-soft);border-radius:999px;padding:1px 9px;margin-bottom:6px}
 .linkbtn{background:none;border:0;padding:6px 0;color:var(--ink-3);font:500 .84rem var(--f-body);text-decoration:underline;text-underline-offset:3px;cursor:pointer;align-self:flex-start}
+/* 버튼 안 글자도 마우스로 선택 가능 */
+.opt,.term,.bub,.q .stem,.esq{user-select:text;-webkit-user-select:text}
 /* 원본 */
 .files{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
 .file{border:1px solid var(--line);border-radius:var(--r);padding:16px;background:var(--panel);display:flex;flex-direction:column;gap:10px;box-shadow:var(--shadow);min-width:0}
@@ -1078,7 +1080,7 @@ function renderSum(){
   body.querySelectorAll(".toc .chip,[data-go]").forEach(b=>b.onclick=()=>{sumS=+(b.dataset.s??b.dataset.go);saveSum();renderSum();if(b.dataset.go!==undefined)window.scrollTo({top:0})});
   const t=body.querySelector(".toc .chip[aria-pressed=true]"); if(t) t.scrollIntoView({inline:"center",block:"nearest"});
   const nw=body.querySelector("[data-nextweek]"); if(nw) nw.onclick=()=>{sumW=WEEKS[WEEKS.indexOf(w)+1].id;sumS=0;saveSum();renderSum();window.scrollTo({top:0})};
-  body.querySelectorAll(".term").forEach(t=>t.onclick=()=>t.classList.toggle("hide"));
+  body.querySelectorAll(".term").forEach(t=>t.onclick=()=>{ if((getSelection()?.toString()||"").trim().length>1) return; t.classList.toggle("hide"); });
   body.querySelector("[data-goquiz]").onclick=()=>{qFilter=w.id;qIdx=0;store.set("qf",qFilter);showTab("quiz")};
   body.querySelector("[data-gogen]").onclick=()=>goFeed([w.id],"variant");
 }
@@ -1172,6 +1174,7 @@ function qCard(q, opts){
      <div class="row"><button class="btn sm blue" data-ai>AI 자세한 해설</button>${mode!=="review"?'<button class="btn sm" data-redo>다시 풀기</button>':""}${mode==="practice"&&wrongs.has(q.id)?'<button class="btn sm" data-known>오답노트에서 빼기</button>':""}</div>
      <div data-out></div></div>`:""}`;
   div.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{
+    if((getSelection()?.toString()||"").trim().length>1) return;
     const i=+b.dataset.i;
     if(mode==="exam" && ans[q.id]===i) delete ans[q.id]; else ans[q.id]=i;
     if(mode==="practice" && i!==q.a) wrongs.add(q.id);
@@ -1730,13 +1733,13 @@ $("#askClear").onclick=()=>{turns=[];store.set("turns2",[]);renderChat()};
 /* 드래그해서 묻기 */
 let selText="", selTimer=null;
 function hideSelAsk(){ $("#selAsk").hidden=true; }
-document.addEventListener("selectionchange",()=>{
+function checkSel(){
   clearTimeout(selTimer);
   selTimer=setTimeout(()=>{
     const sel=getSelection(); const t=(sel?.toString()||"").trim();
     if(!t||t.length<2||!$("#drawer").hidden){hideSelAsk();return}
     const node=sel.anchorNode?.nodeType===1?sel.anchorNode:sel.anchorNode?.parentElement;
-    if(!node||!node.closest("main")||node.closest("textarea,select,input,button.opt")){hideSelAsk();return}
+    if(!node||!node.closest("main")||node.closest("textarea,select,input")){hideSelAsk();return}
     selText=t.slice(0,600);
     const b=$("#selAsk"); b.hidden=false;
     if(!matchMedia("(max-width:640px)").matches){
@@ -1744,8 +1747,11 @@ document.addEventListener("selectionchange",()=>{
       const left=Math.min(Math.max(8,r.left+r.width/2-80+scrollX),document.documentElement.clientWidth-190+scrollX);
       b.style.left=left+"px"; b.style.top=(r.bottom+scrollY+8)+"px";
     } else { b.style.left=""; }
-  },250);
-});
+  },200);
+}
+document.addEventListener("selectionchange",checkSel);
+document.addEventListener("mouseup",e=>{ if(!e.target.closest("#selAsk")) checkSel(); });
+document.addEventListener("touchend",checkSel,{passive:true});
 $("#selAsk").addEventListener("mousedown",e=>e.preventDefault());
 $("#selAsk").onclick=()=>{ const q=selText; hideSelAsk(); getSelection()?.removeAllRanges();
   openDrawer({send:{text:"이 부분 모르겠어. 쉽게 설명하고 시험에 어떻게 나올지도 알려줘.",quote:q}}); };
