@@ -258,7 +258,8 @@ textarea{resize:vertical;min-height:140px;line-height:1.7}
 .bub{max-width:88%;padding:11px 14px;border-radius:14px;font-size:.96rem;line-height:1.7;min-width:0}
 .bub.me{align-self:flex-end;background:var(--ink);color:var(--panel);border-bottom-right-radius:4px}
 .bub.ai{align-self:flex-start;background:var(--sunk);border-bottom-left-radius:4px}
-.bub p{margin:0 0 6px}.bub p:last-child{margin:0}
+.bub p{margin:0 0 6px}
+.bub.ai b,.aiout b,.expl b,.cheat b{font-weight:900;color:var(--ink);background:linear-gradient(transparent 62%,color-mix(in srgb,var(--hl) 55%,transparent) 62%)}.bub p:last-child{margin:0}
 .bub ul{margin:4px 0;padding-left:1.2em}
 .chatin{display:flex;gap:8px;align-items:flex-end}
 .chatin textarea{min-height:50px;height:50px}
@@ -290,7 +291,7 @@ nav.tabs button svg{width:16px;height:16px;flex:0 0 auto}
 @keyframes spin{to{transform:rotate(360deg)}}
 .cheat{font-size:1rem;line-height:1.85}
 .cheat ul{display:flex;flex-direction:column;gap:6px}
-.cheat p b:only-child{display:block;margin-top:10px;font-size:1.05rem}
+.cheat p b:only-child{display:block;margin-top:10px;font-size:1.05rem;background:none!important}
 .finish{background:var(--ok-soft);border-radius:var(--r);padding:20px;display:flex;flex-direction:column;gap:12px}
 .finish b{font-size:1.05rem}
 @media (max-width:640px){
@@ -993,6 +994,7 @@ const ORIG = {"w2": "2주차 — 선사 동굴벽화의 의미와 만화적 상�
 /* ================= 유틸 ================= */
 const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const inl = t => esc(t).replace(/\*\*(.+?)\*\*/g,"<b>$1</b>");
 const strip = s => String(s).replace(/<[^>]+>/g,"");
 function md(t){
   const lines = esc(t).split(/\n/); let out="", inList=false;
@@ -1047,6 +1049,7 @@ const RULES = `수업 공통 규칙:
 - 근거 등급: 확인(실물이 남음) / 기록(글로만 전해짐) / 해석(뒤에 붙인 설명)을 구분한다.
 - 3열 비교표: 옛것 / 만화 문법 / 그런데 여기서 다르다. 세 번째 칸이 비면 미완성.
 - 단일 원인 단정 금지. 여러 조건의 겹침으로 설명.
+- 핵심어(연도, 인명, 작품명, 용어, 정답 키워드)는 **이렇게** 굵게 표시한다. 한 문장에 1~2개만.
 - 수업 자료와 원본에 있는 내용과 표현만 쓴다. 자료에 없는 사실, 비유, 멋을 낸 문구, 새 구호, 과장된 말('무조건', '바로 감점', '필살' 같은 것)을 만들지 않는다. 자료에 없으면 "자료에 없음"이라고만 한다.`;
 
 /* ================= 탭 ================= */
@@ -1233,7 +1236,7 @@ function qCard(q, opts){
      return `<button class="opt ${cls}" data-i="${i}" ${reveal?"disabled":""}><span class="n">${i+1}</span><span>${esc(o)}</span></button>`}).join("")}</div>
    ${reveal?`<div class="fb">
      <div class="verdict ${picked===q.a?"ok":"no"}">${picked===undefined?"안 푼 문제 · 정답은 "+CIRC[q.a]:picked===q.a?"정답":"오답 · 정답은 "+CIRC[q.a]}</div>
-     ${q.ex?`<div class="expl">${esc(q.ex)}</div>`:""}
+     ${q.ex?`<div class="expl">${inl(q.ex)}</div>`:""}
      ${q.warn?`<div class="warnnote"><b>자료와 비교</b> ${esc(q.warn)}</div>`:""}
      <div class="row"><button class="btn sm blue" data-ai>AI 자세한 해설</button>${mode!=="review"?'<button class="btn sm" data-redo>다시 풀기</button>':""}${mode==="practice"&&wrongs.has(q.id)?'<button class="btn sm" data-known>오답노트에서 빼기</button>':""}</div>
      <div data-out></div></div>`:""}`;
@@ -1809,7 +1812,7 @@ const CHAT_RULES = (question)=>{ const keys=origKeys(question); const full=keys.
 - 인사, 자기소개, 공부 전략 안내, 규칙 되풀이, "어떻게 도와드릴까요" 같은 말은 절대 쓰지 않는다.
 - 학생의 마지막 질문에만 바로 답한다. 첫 줄부터 답.
 ${ansLen==="short"
- ?"- 답은 최대 3문장. 첫 문장이 바로 결론. 목록·소제목·예시 나열 금지. 시험 포인트가 꼭 필요하면 마지막 한 문장으로만."
+ ?"- 답은 최대 3문장. 첫 문장이 바로 결론. 문장마다 줄을 바꾼다. 소제목·예시 나열 금지. 시험 포인트가 꼭 필요하면 마지막 한 문장으로만."
  :"- 자세히 모드: 최대 8줄. 짧은 목록 가능. 마크다운 제목 금지."}
 - 이 지시문 자체에는 답하지 않는다. 퀴즈를 내달라고 하면 문제만 내고 정답은 학생이 답한 뒤에 알려준다. 학생이 틀리게 이해한 부분은 분명히 지적한다.
 
