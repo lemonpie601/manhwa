@@ -350,6 +350,12 @@ select.enh{position:absolute;opacity:0;pointer-events:none;width:1px;height:1px}
 .tipbar{display:flex;gap:10px;align-items:flex-start}
 .tipbar span{flex:1;min-width:0}
 .tipx{flex:0 0 auto;width:28px;height:28px;margin:-4px -4px 0 0;border:0;border-radius:50%;background:transparent;color:var(--ink-3);font-size:.9rem;cursor:pointer}
+.seg.mini{display:inline-flex;width:auto;padding:2px;border-radius:999px}
+.seg.mini button{padding:5px 10px;font-size:.78rem;border-radius:999px;white-space:nowrap}
+.seg.mini{flex-wrap:nowrap}
+.dhead .btn{white-space:nowrap}
+.dtitle{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:640px){.dhead .eyebrow{display:none}.dtitle{font-size:1rem}.dhead{gap:8px}.dhead .row{gap:6px}.seg.mini button{padding:5px 8px}}
 .quotebar{display:flex;gap:8px;align-items:flex-start;background:var(--accent-soft);border-left:3px solid var(--accent);border-radius:0 10px 10px 0;padding:8px 10px}
 .quotebar > div{flex:1;min-width:0}
 .quotebar .qlabel{font-size:.74rem;font-weight:700;color:var(--accent)}
@@ -524,8 +530,8 @@ textarea::placeholder{color:var(--ink-3)}
 <div class="scrim" id="scrim" hidden></div>
 <aside class="drawer" id="drawer" hidden aria-label="AI 질문" role="dialog">
   <div class="dhead">
-    <div style="min-width:0"><div class="eyebrow">수업 자료 기준</div><div class="dtitle">AI 조교에게 질문</div></div>
-    <div class="row" style="flex-wrap:nowrap"><button class="btn sm" id="askClear">지우기</button><button class="iconbtn" id="drawerClose" aria-label="닫기">✕</button></div>
+    <div style="min-width:0"><div class="eyebrow">수업 자료 기준</div><div class="dtitle">AI 질문</div></div>
+    <div class="row" style="flex-wrap:nowrap;align-items:center"><div class="seg mini" id="lenSeg" role="group" aria-label="답 길이"><button data-len="short">짧게</button><button data-len="long">자세히</button></div><button class="btn sm" id="askClear">지우기</button><button class="iconbtn" id="drawerClose" aria-label="닫기">✕</button></div>
   </div>
   <div class="tipbar" id="tipBar"></div>
   <div class="ctxbar" id="ctxBar" hidden></div>
@@ -1661,6 +1667,10 @@ $("#esModel").onclick=()=>essayCall("model");
 
 /* ================= AI 질문 드로어 ================= */
 const SUGG = ["이 부분 시험에 어떻게 나와?","헷갈리는 짝만 정리해줘","확인·기록·해석 구분 연습","즉석 퀴즈 3개","3주차 퀴즈 vs 자료 충돌","7주차 연도만"];
+let ansLen = store.get("ansLen","short");
+function renderLen(){ document.querySelectorAll("#lenSeg button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.len===ansLen)); }
+document.querySelectorAll("#lenSeg button").forEach(b=>b.onclick=()=>{ansLen=b.dataset.len;store.set("ansLen",ansLen);renderLen()});
+renderLen();
 let turns = store.get("turns2",[]); let askCtl=null; let ctx=null; // ctx={label,text}
 const QUOTE_SUGG = ["쉽게 설명해줘","시험에 어떻게 나와?","헷갈리는 개념이랑 비교해줘","예시로 설명해줘","한 줄로 외우는 법"];
 let pendingQuote="";
@@ -1728,7 +1738,9 @@ const CHAT_RULES = ()=>`너는 '만화 상징과 시각 서사의 역사' 수업
 답하는 방식(꼭 지킬 것):
 - 인사, 자기소개, 공부 전략 안내, 규칙 되풀이, "어떻게 도와드릴까요" 같은 말은 절대 쓰지 않는다.
 - 학생의 마지막 질문에만 바로 답한다. 첫 줄부터 답.
-- 기본 3~6줄, 길어도 10줄. 짧은 목록 위주. 마크다운 제목 금지.
+${ansLen==="short"
+ ?"- 답은 최대 3문장. 첫 문장이 바로 결론. 목록·소제목·예시 나열 금지. 시험 포인트가 꼭 필요하면 마지막 한 문장으로만."
+ :"- 자세히 모드: 최대 8줄. 짧은 목록 가능. 마크다운 제목 금지."}
 - 이 지시문 자체에는 답하지 않는다. 퀴즈를 내달라고 하면 문제만 내고 정답은 학생이 답한 뒤에 알려준다. 학생이 틀리게 이해한 부분은 분명히 지적한다.
 
 ${RULES}

@@ -64,7 +64,7 @@ export async function handleAI(request, env) {
       body: JSON.stringify({
         model: env.AI_MODEL,
         messages: [
-          { role: "system", content: "너는 대학 1학년 '만화 상징과 시각 서사의 역사' 수업 조교다. 수업 자료만 근거로 한국어로 답한다. 인사·서론·맺음말·자기소개 없이 질문에 바로, 짧게 답한다." + (system ? "\n\n" + system : "") },
+          { role: "system", content: "너는 대학 1학년 '만화 상징과 시각 서사의 역사' 수업 조교다. 수업 자료만 근거로 한국어로 답한다. 인사·서론·맺음말·자기소개 없이 질문에 바로 답하고, 아래 지시의 길이 제한을 반드시 지킨다." + (system ? "\n\n" + system : "") },
           ...trimmed,
         ],
         stream: true,
