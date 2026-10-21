@@ -39,8 +39,19 @@ export async function handleAI(request, env) {
     .filter(m => m && (m.role === "user" || m.role === "assistant") && typeof m.content === "string" && m.content.trim())
     .map(m => ({ role: m.role, content: m.content }));
   if (!messages.length) return json(400, { code: "invalid_request" });
-  // 첫 user 턴(수업 자료 규칙)은 남기고 오래된 대화만 자른다
-  const trimmed = messages.length > MAX_TURNS ? [messages[0], ...messages.slice(-(MAX_TURNS - 1))] : messages;
+  // 여러 턴이면 첫 user 턴은 지시문(수업 자료) → system으로 옮긴다
+  let system = "";
+  let convo = messages;
+  if (messages.length > 1 && messages[0].role === "user") { system = messages[0].content; convo = messages.slice(1); }
+  if (convo.length > MAX_TURNS) convo = convo.slice(-MAX_TURNS);
+  while (convo.length && convo[0].role !== "user") convo = convo.slice(1);
+  // 같은 역할이 연달아 오면 하나로 합친다 (게이트웨이·모델마다 처리 방식이 달라서)
+  const trimmed = [];
+  for (const m of convo) {
+    const last = trimmed[trimmed.length - 1];
+    if (last && last.role === m.role) last.content += "\n\n" + m.content; else trimmed.push({ ...m });
+  }
+  if (!trimmed.length) return json(400, { code: "invalid_request" });
 
   const base = (env.AI_BASE_URL || "https://linkapi.ai/v1").replace(/\/+$/, "");
   const path = env.AI_PATH || "/chat/completions";
@@ -53,7 +64,7 @@ export async function handleAI(request, env) {
       body: JSON.stringify({
         model: env.AI_MODEL,
         messages: [
-          { role: "system", content: "너는 대학 1학년 '만화 상징과 시각 서사의 역사' 수업 조교다. 사용자가 준 수업 자료만 근거로 한국어로 답한다." },
+          { role: "system", content: "너는 대학 1학년 '만화 상징과 시각 서사의 역사' 수업 조교다. 수업 자료만 근거로 한국어로 답한다. 인사·서론·맺음말·자기소개 없이 질문에 바로, 짧게 답한다." + (system ? "\n\n" + system : "") },
           ...trimmed,
         ],
         stream: true,
