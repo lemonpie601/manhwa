@@ -345,6 +345,11 @@ select.enh{position:absolute;opacity:0;pointer-events:none;width:1px;height:1px}
 .sendbtn svg{width:22px;height:22px}
 .bub .quote{display:block;border-left:3px solid currentColor;opacity:.8;padding-left:8px;margin-bottom:6px;font-size:.9em}
 
+.tipbar{margin:12px 18px 0;border:1px dashed color-mix(in srgb,var(--accent) 55%,transparent);background:var(--accent-soft);color:var(--ink);border-radius:10px;padding:10px 12px;font-size:.86rem;line-height:1.6}
+.tipbar b{color:var(--accent)}
+@media (max-width:640px){.tipbar,.ctxbar{margin-inline:16px}
+  .seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;width:100%;border-radius:12px}
+  .seg button{padding:9px 6px;font-size:.84rem;border-radius:9px;line-height:1.3}}
 /* 원본 */
 .files{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
 .file{border:1px solid var(--line);border-radius:var(--r);padding:16px;background:var(--panel);display:flex;flex-direction:column;gap:10px;box-shadow:var(--shadow);min-width:0}
@@ -474,6 +479,7 @@ select.enh{position:absolute;opacity:0;pointer-events:none;width:1px;height:1px}
     <div style="min-width:0"><div class="eyebrow">수업 자료 기준</div><div class="dtitle">AI 조교에게 질문</div></div>
     <div class="row" style="flex-wrap:nowrap"><button class="btn sm" id="askClear">지우기</button><button class="iconbtn" id="drawerClose" aria-label="닫기">✕</button></div>
   </div>
+  <div class="tipbar" id="tipBar"></div>
   <div class="ctxbar" id="ctxBar" hidden></div>
   <div class="chat" id="chat" aria-live="polite"></div>
   <div class="dfoot">
@@ -724,6 +730,174 @@ const ESSAYS = [
  ["w7","평면 채색이 강해진 이유를 단일 원인이 아니라 조건들의 겹침으로 설명하라."]
 ];
 
+
+/* ================= 초압축 (미리 써 둔 시험용 압축본) ================= */
+const CMP = {
+w2:{
+page:`**2주차 · 동굴벽화**
+- 쇼베: 1994, 아르데슈, 목탄 AMS. 1차 37,000–33,500 / 2차 31,000–28,000. 사자·코뿔소·곰 같은 위험 동물
+- 라스코: 1940 마을 소년들, 도르도뉴, 약 17,000(중앙값). 안료가 무기물이라 탄소 측정 불가. 우물 장면
+- 알타미라: 1879 사우투올라, 칸타브리아, 약 2만 년 **누적**. U-Th 35,600은 과대평가 가능
+- 쇼베 연대 측정은 **흑색(목탄)만**. 적색은 측정 못 함. 반론: 숯의 나이 ≠ 그림의 나이
+- 해석 순서: 예술충동 → 사냥주술 → 구조주의(르루아구랑) → 신경심리(루이스윌리엄스) → 서사·인지
+- 사냥주술 기각 = **그린 동물 ≠ 먹은 뼈**. 브뢰이는 사냥꾼 무덤 찾아 팠지만 **아무것도 없음**
+- 루이스윌리엄스(벽 = 막) 약점 = **검증 불가** / 르루아구랑 약점 = 분류가 연구자 판단
+- 시간은 **홈통**에서 흐름. 도상 추상화 = 최소 특징만. 배치망(그로엔스틴) = 의미는 **배치 관계**에서
+- 맥클라우드 정의에서 쟁점 = **의도된 순서** (증명 불가)
+- 기출 정답 키워드: 흑색만 · 알타미라 · 뼈 불일치 · 무덤 없음 · 막/검증 불가 · 홈통 · 도상 추상화 · 배치 관계 · 의도된 순서`,
+half:`**2주차 · 동굴벽화**
+- 연대: 쇼베는 목탄(흑색)만 측정, 알타미라는 2만 년 누적, 라스코는 간접 추정
+- 해석: 사냥주술은 그린 동물 ≠ 먹은 뼈로 기각, 브뢰이 발굴은 빈손, 루이스윌리엄스(벽 = 막)는 검증 불가
+- 만화 도구: 시간은 홈통, 도상 추상화 = 최소 특징, 배치망 = 배치 관계, 맥클라우드 쟁점 = 의도된 순서`,
+cut:`**2주차**
+- 쇼베 연대 = 흑색만 (적색 X)
+- 누적 = 알타미라
+- 사냥주술 기각 = 벽 동물 ≠ 출토 뼈
+- 브뢰이 = 무덤 찾아 팠는데 없음
+- 루이스윌리엄스 = 막 / 검증 불가
+- 배치망 = 그로엔스틴 = 배치 관계`},
+w3:{
+page:`**3주차 · 고대 문명**
+- 닮음 = 도상, 실제 연결(연기·발자국) = 지표, 약속 = 상징. **머리 위 전구 = 약속 기호**
+- 홈통 = 칸 사이 빈 공간. 교실 → 밤거리 = 장면 전환이라 **많이 채워야** 함
+- 우르의 스탠더드(BC 2600–2400): 상감 물체, 3단 레지스터. 퀴즈 정답 = **신분 표시**
+- 나람신 승전비(BC 23세기): 대각선, 뿔 관. 퀴즈 정답 = **규칙을 깨서 신에 가깝다는 뜻**
+- 이집트 옆모습+정면 = **각 부위를 가장 알아보기 쉬운 각도로** (실력 부족 X)
+- 격자 캐논 vs 캐릭터 시트: 퀴즈 정답 = **국가와 신전이 정해 어길 수 없었다**
+- 후네퍼 『사자의 서』(약 BC 1275): 심장 vs 마아트 깃털. 아누비스 안내, 토트 기록, 암무트 위협, 오시리스 심판
+- 그리스 도자기 인물 구별 = **들고 있는 물건(속성물)**. 삼지창 = 포세이돈, 사자 가죽·곤봉 = 헤라클레스
+- 트라야누스 원기둥(AD 113): 퀴즈 정답 = **칸이 없어 홈통이 없어서**
+- 주의: 4·5·7·9번은 정리자료와 충돌. 객관식은 퀴즈 정답, 서술형은 자료 표현(“신분만 X”, “흰 홈통 없어도 추론 있음”)`,
+half:`**3주차 · 고대 문명**
+- 전구 = 약속 기호, 홈통 = 칸 사이, 장면 전환은 많이 채운다
+- 레지스터 = 신분, 나람신 = 규칙 깨서 신성, 이집트 = 알아보기 쉬운 각도, 격자 캐논 = 국가·신전이 정해 못 어김
+- 그리스 = 들고 있는 물건, 트라야누스 = 칸·홈통 없음 (퀴즈 기준, 서술형은 자료 쪽으로 보완)`,
+cut:`**3주차**
+- 전구 = 약속 기호
+- 레지스터 = 신분 표시
+- 나람신 = 규칙 깨서 신에 가까움
+- 이집트 섞어 그리기 = 알아보기 쉬운 각도
+- 격자 캐논 = 국가·신전이 정함
+- 그리스 = 들고 있는 물건 / 트라야누스 = 홈통 없음`},
+w4:{
+page:`**4주차 · 중세**
+- 도구 ③ = 약속 설정, ④ = 테두리
+- 지물 = 인물마다 정해 두고 항상 함께 그린 물건. 열쇠 = 베드로, 칼 = 바울, 바퀴 = 카타리나, **석쇠 = 라우렌시오**, 사자 = 마르코
+- 열쇠 → 베드로로 읽힘 = **약속 기호**
+- 후광: 십자 = 그리스도, 둥근 = 성인·고인, **사각 = 생존 인물·후원자**
+- 크기: 중세 = **지위**, 만화 = **지금 이 순간**
+- 설정 3조건 = 중복하지 않기 · 반복하기 · 공유하기 (비밀 X). 연구 이름 = 도상학
+- 바이외 = **1077년 무렵 리넨에 양모실 자수**(태피스트리 아님). 칸 없음, 장면 문구 = 티툴리
+- 254굴 = 이시동도, 칸 없음 / **428굴 = 3단, 그린 사람이 순서 정함**
+- 샤르트르 = **아래 → 위**, 맨 아래 3칸 = 창값 낸 **구두 장인**. 틀 = 칸, **납선 = 홈통**
+- 성경 필사본 = 원형 8개 **Z자**
+- 칸 = 결정권을 옮기는 장치, 방향은 설정이 정함
+- 티툴리 = 캡션 상자 / 반데롤 = ‘작은 깃발’, 말이 적힌 띠, **13~14세기** 확산
+- 지물 = 가진 물건, 필락테스 = 한 말
+- 보아 프로타 = 가장 이른 목판 인쇄 판목(14세기 말~15세기 초)
+- phylactère: 영어·한국어는 **안 씀**. 말 지정 방법에 ‘후광 겹치기’는 없음
+- 메소아메리카 = 문제는 보편적, 약속은 지역적. 바른 문장 = “이미 각자의 필요에 따라 작동하고 있었다”`,
+half:`**4주차 · 중세**
+- 석쇠 = 라우렌시오, 열쇠 → 베드로 = 약속 기호, 사각 후광 = 생존 후원자, 크기 = 지위, 설정 3조건(비밀 X)
+- 바이외 = 1077 리넨 자수, 428굴 = 3단, 샤르트르 = 아래 → 위 · 구두 장인 · 납선 = 홈통, 필사본 = Z자
+- 티툴리 = 캡션, 반데롤 = 13~14세기 말 두루마리, 필락테스 = 한 말, 보아 프로타 = 이른 판목, 영어·한국어는 phylactère 안 씀`,
+cut:`**4주차**
+- 라우렌시오 = 석쇠 (사자 X)
+- 사각 후광 = 생존 인물·후원자
+- 바이외 = 자수 (태피스트리 X)
+- 샤르트르 = 아래 → 위, 맨 아래 = 구두 장인
+- 티툴리 = 캡션 / 반데롤 = 13~14세기
+- 지물 = 가진 물건, 필락테스 = 한 말`},
+w5:{
+page:`**5주차 · 르네상스**
+- 아래에서 올려다보는 느낌 = **눈높이 선**의 높이
+- 대사 없이 중요 인물 표시 = **소실점** 자리에 놓기 (크게 그리기 X)
+- 1점 = 안정, 2점 = 현실감, **3점 = 아찔·추락**
+- 배경의 일: 장소 · 시간 · 기분 · **칸 묶기(4번째)**
+- 배경을 하얗게 지운 개그 만화에서 칸을 잇는 것 = **캐릭터**
+- 매 칸 얼굴이 달라도 같은 사람 = **반복 특징 한두 개**
+- 판으로 수백 장 찍으면 = 같은 모양 반복 → **약속이 굳음**
+- 나스타조 이야기 = 장르는 **투시·배경·캐릭터 조합**
+- 글로만 전해짐 = **기록** (실물 = 확인, 뒤에 붙인 설명 = 해석)
+- 앵글은 공식 아님. 비교하면 마침 문장 붙이기`,
+half:`**5주차 · 르네상스**
+- 눈높이 선 = 독자 자리, 소실점 = 주인공, 3점 투시 = 아찔
+- 배경 4번째 일 = 칸 묶기, 배경 지우면 캐릭터가 묶음, 같은 사람 = 반복 특징 1~2개
+- 찍어내면 약속이 굳음, 장르 = 투시 + 배경 + 캐릭터, 글로만 = 기록`,
+cut:`**5주차**
+- 올려다봄 = 눈높이 선
+- 주인공 지정 = 소실점
+- 추락 = 3점 투시
+- 배경 4번째 = 칸 묶기 / 배경 없으면 = 캐릭터
+- 장르 = 투시·배경·캐릭터 조합
+- 글로만 = 기록`},
+w6:{
+page:`**6주차 · 북유럽**
+- 도구 ⑦ 증인 / ⑧ 사물이 대신하는 말 / ⑨ 그림값은 누구 지갑
+- 이탈리아 = 프레스코·템페라 / 플랑드르 = **유화**. 장점 = **천천히 말라 덧칠 수정 가능**
+- 아르놀피니(1434): 거울에 **방에 없는 인물**, 서명 = **화가가 여기 있었다**
+- 확인 = 그림·서명 원문·오크 패널 / 해석 = **결혼식이냐 추모냐**
+- 부유한 구매층 배경 = **모직물 무역**
+- 메로드 제단화(캉팽) 수태고지 배경 = **평범한 플랑드르 거실**
+- 데보티오 모데르나 = **혼자 보는 소형 그림** 수요
+- 꺼진 촛불 연기 = 실제 그려진 디테일 + 상징 해석 / 백합 = 순수함은 **해석**
+- 도구 ⑧ 확인법 = **빼도 이야기가 되는지 상상**. 인물이 직접 말하면 물건 역할 **약해짐**
+- 소형 패널 → 사물 하나하나가 중요해짐. 만화로 옮기면 = **복선이 되는 소품**
+- 주문 생산 = **사는 사람이 미리 정해짐** / 시장 생산 = 그림이 **작아짐**
+- 교회 주문 감소 이유에 ‘화가들이 그림 중단’은 없음. 장르 분화 = **한 종류만 그리는 게 유리**
+- 정물화 = 사물만. 길드·종교개혁 문서 = **기록**. 풍속화 = 이름 없는 사람들. ⑨ 현대판 = 수익은 어디서 나오나`,
+half:`**6주차 · 북유럽**
+- 플랑드르 = 유화(천천히 말라 수정), 거울 = 방에 없는 인물, 서명 = 여기 있었다, 결혼/추모 = 해석, 배경 = 모직물 무역
+- 메로드 = 평범한 거실, 데보티오 = 개인 소형 그림, 백합 = 해석, ⑧ = 빼 보기, 직접 말하면 약해짐, 복선 소품
+- 주문 = 사는 사람 정해짐, 시장 = 작아짐, 장르 분화 = 한 종류가 유리, 정물 = 사물만, 문서 = 기록, 풍속 = 평범한 사람`,
+cut:`**6주차**
+- 플랑드르 = 유화 = 천천히 마름
+- 서명 = 여기 있었다 / 거울 = 없는 사람
+- 결혼·추모 = 해석 / 문서 = 기록
+- 메로드 배경 = 평범한 거실
+- 주문 생산 = 사는 사람 정해짐 / 시장 생산 = 작아짐
+- 장르 분화 = 한 종류만 그리는 게 유리`},
+w7:{
+page:`**7주차 · 근대**
+- 1580~90년대 과장 초상 소묘 = 확인 → **1646 서문의 이름 = 기록**
+- 포장지 vs 인쇄 작업실 이야기 = **둘 다 해석, 확인 못함**
+- 19세기 초 ‘만화’ = **붓 가는 대로 그린 스케치 모음** (이야기 그림 X). 북재만화 1814, 목판 3색, 교본
+- 비교 마침 = “**둘이 이어져 있다는 증거는 우리가 확인하지 못했다**”
+- 색 석판에 색 하나 추가 = **돌 하나 더 + 인쇄 한 번 더**
+- 평면 채색이 강해진 이유 = **여러 조건이 함께** (인쇄 기술 하나 X, 일본 판화 하나 X, 한 화가 발명 X)
+- 한 장 → 매주·매일 = **다음 호를 기다리고 마감이 생김**
+- 사진 이후 질문 = 손그림은 뭘 해야 하나 → **답은 화가마다 달랐다**
+- 도구 ⑨ 잘라내기: 선 / **색 = 명암을 고른 색면으로** / 틀 = 가장자리에서 잘라냄
+- 도구 ⑩ 손의 개수: 석판 포스터 = **광고주 · 화가 · 인쇄소 · 벽에 붙이는 사람**
+- 연도: 1695 허가법 만료, 1735 판화 저작권법, 1814 증기 인쇄기, 1835 9월법, 1839 사진, 1843 ‘카툰’, 1881 출판 자유법`,
+half:`**7주차 · 근대**
+- 1646 서문 = 기록, 포장지 이야기 = 해석, 19세기 초 만화 = 스케치 모음, 비교는 마침 문장으로 닫기
+- 색 하나 = 돌 하나 + 인쇄 한 번, 평면 채색 = 여러 조건, 정기 간행 = 마감
+- 사진 이후 = 답은 화가마다, 색으로 자르기 = 명암을 색면으로, 손 = 광고주·화가·인쇄소·붙이는 사람`,
+cut:`**7주차**
+- 1646 서문 = 기록 / 포장지 = 해석
+- 漫画(19세기 초) = 스케치 모음
+- 색 하나 더 = 돌 하나 더
+- 단일 원인 보기 = 오답
+- 색으로 자르기 = 명암 → 색면
+- 포스터 손 = 광고주·화가·인쇄소·붙이는 사람`},
+all:{
+cut:`**시험장 30초 컷**
+- 쇼베 연대 = 흑색만 / 누적 = 알타미라
+- 사냥주술 기각 = 벽 동물 ≠ 출토 뼈 / 브뢰이 = 무덤 없음
+- 레지스터 = 신분 / 트라야누스 = 홈통 없음 (3주차 퀴즈 기준)
+- 이집트 섞어 그리기 = 알아보기 쉬운 각도 / 그리스 = 들고 있는 물건
+- 라우렌시오 = 석쇠 / 사각 후광 = 생존 인물·후원자
+- 바이외 = 1077 리넨 자수 / 샤르트르 = 아래 → 위
+- 반데롤 = 13~14세기 / phylactère를 영어·한국어는 안 씀
+- 소실점 = 주인공 / 3점 = 추락 / 배경 4번째 = 칸 묶기
+- 플랑드르 = 유화(천천히 마름) / 서명 = 여기 있었다
+- 주문 생산 = 사는 사람 정해짐 / 시장 생산 = 작아짐
+- 1646 서문 = 기록 / 포장지 이야기 = 해석
+- 색 하나 더 = 돌 하나 더 / 단일 원인 보기 = 오답
+- 규칙: 기원·조상·최초 금지, 비교는 “이어져 있다는 증거는 확인하지 못했다”로 닫기`}
+};
+["page","half"].forEach(lv=>{CMP.all[lv]=WEEKS.map(w=>CMP[w.id][lv]).join("\n\n")});
 /* ================= 유틸 ================= */
 const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -801,7 +975,7 @@ document.querySelectorAll("nav.tabs button").forEach(b=>b.addEventListener("clic
 /* ================= 요약 ================= */
 let sumW = store.get("sumW","rules"), sumS = store.get("sumS",0);
 function renderWkChips(){
-  const items=[["ai","AI 초압축"],["rules","시험 규칙"],...WEEKS.map(w=>[w.id,w.no+"주차"])];
+  const items=[["ai","초압축"],["rules","시험 규칙"],...WEEKS.map(w=>[w.id,w.no+"주차"])];
   $("#wkChips").innerHTML = items.map(([k,l])=>`<button class="chip" aria-pressed="${k===sumW}" data-w="${k}">${l}</button>`).join("");
   $("#wkChips").querySelectorAll(".chip").forEach(c=>c.onclick=()=>{sumW=c.dataset.w;sumS=0;saveSum();renderSum();window.scrollTo({top:0})});
 }
@@ -881,18 +1055,28 @@ let cmpScope = store.get("cmpScope","all"), cmpLevel = store.get("cmpLevel","hal
 let cmpCache = store.get("cmp",{});
 function renderCompress(body){
   const scopes=[["all","전체"],...WEEKS.map(w=>[w.id,w.no+"주차"]),["wrong",`내 오답 ${wrongs.size}`]];
-  const key=cmpScope+":"+cmpLevel; const cached=cmpCache[key];
-  body.innerHTML=`<div class="panel"><div class="eyebrow">Claude가 시험용으로 압축</div><h2>AI 초압축</h2>
-    <p class="lead" style="margin-bottom:18px">요약을 한 번 더 줄인 버전이에요. 기출 정답을 고르는 데 필요한 것만 남깁니다. 한 번 만들면 이 기기에 저장돼요.</p>
+  const isWrong=cmpScope==="wrong";
+  let content="";
+  if(!isWrong) content=md(CMP[cmpScope][cmpLevel]);
+  else {
+    const qs=QUIZ.filter(q=>wrongs.has(q.id));
+    content = qs.length? qs.map(q=>`<p><b>${WK(q.w).no}주차</b> ${esc(q.q)}</p><ul><li>정답: <b>${esc(q.o[q.a])}</b></li>${answers[q.id]!==undefined&&answers[q.id]!==q.a?`<li>내가 고른 것: ${esc(q.o[answers[q.id]])}</li>`:""}${q.ex?`<li>${esc(q.ex)}</li>`:""}</ul>`).join("")
+      : `<p class="hint">아직 틀린 문제가 없어요. 기출이나 실전 50을 풀면 여기 모여요.</p>`;
+  }
+  const aiKey="wrong:"+[...wrongs].sort().join(",");
+  body.innerHTML=`<div class="panel"><div class="eyebrow">시험용으로 미리 줄여 둔 버전</div><h2>초압축</h2>
+    <p class="lead" style="margin-bottom:18px">요약을 한 번 더 줄였어요. 기출 정답을 고르는 데 필요한 것만 남겼습니다. 단계를 내려갈수록 더 짧아져요.</p>
     <div class="lbl" style="margin-bottom:14px">범위<div class="chips hscroll" style="padding-left:0">${scopes.map(([k,l])=>`<button class="chip" data-sc="${k}" aria-pressed="${k===cmpScope}">${l}</button>`).join("")}</div></div>
-    <div class="lbl" style="margin-bottom:18px">압축 단계<div class="seg" role="group">${Object.entries(LEVELS).map(([k,v])=>`<button data-lv="${k}" aria-pressed="${k===cmpLevel}">${v[0]}</button>`).join("")}</div></div>
-    <div class="row"><button class="btn pri" id="cmpBtn">${cached?"다시 만들기":"압축하기"}</button></div>
-    <div class="status" id="cmpStatus"></div></div>
-    <div class="panel cheat" id="cmpOut" ${cached?"":"hidden"}>${cached?md(cached):""}</div>`;
+    ${isWrong?"":`<div class="lbl">압축 단계<div class="seg" role="group">${Object.entries(LEVELS).map(([k,v])=>`<button data-lv="${k}" aria-pressed="${k===cmpLevel}">${v[0]}</button>`).join("")}</div></div>`}
+    </div>
+    <div class="panel cheat">${content}</div>
+    ${isWrong&&wrongs.size?`<div class="panel"><h3>AI로 내 오답 구별 포인트 정리</h3><p class="hint">내가 헷갈린 보기와 정답을 어떻게 구별하는지 AI가 짧게 정리해 줘요.</p>
+      <div class="row"><button class="btn blue" id="cmpBtn">${cmpCache[aiKey]?"다시 정리하기":"정리하기"}</button></div><div class="status" id="cmpStatus"></div>
+      <div class="cheat aiout" id="cmpOut" style="margin-top:12px" ${cmpCache[aiKey]?"":"hidden"}>${cmpCache[aiKey]?md(cmpCache[aiKey]):""}</div></div>`:""}`;
   body.querySelectorAll("[data-sc]").forEach(b=>b.onclick=()=>{cmpScope=b.dataset.sc;store.set("cmpScope",cmpScope);renderCompress(body)});
   body.querySelectorAll("[data-lv]").forEach(b=>b.onclick=()=>{cmpLevel=b.dataset.lv;store.set("cmpLevel",cmpLevel);renderCompress(body)});
   const sel=body.querySelector('[data-sc][aria-pressed="true"]'); if(sel) sel.scrollIntoView({inline:"center",block:"nearest"});
-  body.querySelector("#cmpBtn").onclick=()=>makeCompress(body,key);
+  const cb=body.querySelector("#cmpBtn"); if(cb) cb.onclick=()=>makeCompress(body,aiKey);
 }
 async function makeCompress(body,key){
   const sample=await getSample(); const st=body.querySelector("#cmpStatus"), out=body.querySelector("#cmpOut"), btn=body.querySelector("#cmpBtn");
@@ -909,8 +1093,7 @@ async function makeCompress(body,key){
   const qlist=qs.map(q=>`[${WK(q.w).no}주차] ${q.q} → 정답: ${q.o[q.a]}${cmpScope==="wrong"&&answers[q.id]!==undefined&&answers[q.id]!==q.a?` (학생이 고른 오답: ${q.o[answers[q.id]]})`:""}`).join("\n");
   const prompt=`너는 '만화 상징과 시각 서사의 역사' 중간고사 벼락치기 조교다. 시험 객관식은 아래 기출 중에서 50문항이 그대로 또는 표현만 바뀌어 나온다. 학생이 시험 직전에 볼 초압축 요약을 써라.
 
-단계: ${lv[0]} — ${lv[1]}
-${cmpScope==="wrong"?"범위: 학생이 틀린 기출. 각 항목에 '헷갈린 보기 ≠ 정답' 구별 포인트를 붙여라.":""}
+범위: 학생이 틀린 기출. 항목마다 '헷갈린 보기 ≠ 정답' 구별 포인트를 한 줄로. 마지막에 공통으로 헷갈리는 패턴 2~3줄.
 규칙: 수업 자료와 기출에 있는 내용만. 문장은 짧게, 명사형으로 끝내도 된다. 주차 제목은 **2주차** 처럼 굵게 한 줄로 쓰고 그 아래 - 목록. 다른 마크다운 제목은 쓰지 마라.
 
 ${RULES}
@@ -1414,7 +1597,7 @@ $("#sugg").querySelectorAll("button").forEach(b=>b.onclick=()=>{$("#askIn").valu
 function renderChat(){
   const c=$("#chat");
   c.innerHTML = turns.length? turns.map(t=>`<div class="bub ${t.role==="user"?"me":"ai"}">${t.role==="user"?(t.quote?`<span class="quote">${esc(t.quote)}</span>`:"")+esc(t.show??t.content):md(t.content)}</div>`).join("")
-   : `<div class="empty">수업 자료 전체를 아는 조교예요.<br>요약이나 문제를 보다가 바로 물어보세요.<br><br><span class="hint">글자를 드래그하면 ‘이 부분 AI에게 묻기’ 버튼이 떠요.</span></div>`;
+   : `<div class="empty">수업 자료 전체를 아는 조교예요.<br>요약이나 문제를 보다가 바로 물어보세요.<br><br><span class="hint">위 안내처럼 글자를 선택해서 바로 물어볼 수도 있어요.</span></div>`;
   c.scrollTop=c.scrollHeight;
 }
 function renderCtx(){
@@ -1437,8 +1620,12 @@ function currentContext(){
   return null;
 }
 let lastFocus=null;
+function renderTip(){
+  const m=matchMedia("(max-width:640px)").matches;
+  $("#tipBar").innerHTML=`<b>바로 묻기</b> 요약이나 문제에서 모르는 글자를 ${m?"꾹 눌러 선택":"마우스로 드래그"}하면 <b>‘이 부분 AI에게 묻기’</b> 버튼이 떠요. 지금 보는 화면 내용은 자동으로 함께 보내져요.`;
+}
 function openDrawer(opts={}){
-  lastFocus=document.activeElement;
+  lastFocus=document.activeElement; renderTip();
   $("#drawer").hidden=false; $("#scrim").hidden=false; $("#fab").hidden=true; hideSelAsk();
   ctx = opts.ctx!==undefined?opts.ctx:currentContext(); renderCtx(); renderChat();
   if(opts.send){ $("#askIn").value=opts.send.text; ask(opts.send.quote); }
