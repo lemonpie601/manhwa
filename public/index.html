@@ -1727,7 +1727,12 @@ ${ctx}
 
 문제: ${q}
 
-한국어 6~10문장. 핵심 키워드는 **굵게**. 필요한 곳에 (확인)/(기록)/(해석) 표시. 비교 문제면 마지막에 마침 문장. 그 뒤 '외울 키워드:' 한 줄.`;
+한국어로 시험지에 바로 옮겨 쓸 수 있는 길이로:
+- 본문은 3~4문장, 공백 포함 300자 이내. 서론·배경 설명·예시 나열 없이 문제가 묻는 것만.
+- 핵심 키워드는 **굵게**. 근거 등급은 꼭 필요한 곳 한두 군데만 (확인)/(기록)/(해석) 표시.
+- 비교 문제면 마지막 문장을 마침 문장으로.
+- 본문 뒤에 줄을 바꿔 '외울 키워드:' 한 줄 (키워드 3~5개).
+- 소제목, 목록, 인사, 덧붙이는 설명 금지.`;
   $("#esBtn").disabled=$("#esModel").disabled=true; st.className="status"; st.innerHTML=`<span class="dots">${mode==="grade"?"채점 중":"모범답안 쓰는 중"}</span>`; out.innerHTML="";
   try{ const {text}=await sample(prompt,{cache:mode==="grade"?false:true,onText:({text})=>{out.innerHTML=`<div class="aiout" style="margin-top:12px">${md(text)}</div>`}}); out.innerHTML=`<div class="aiout" style="margin-top:12px">${md(text)}</div>`; st.textContent=""; }
   catch(e){ if(e.text) out.innerHTML=`<div class="aiout" style="margin-top:12px">${md(e.text)}</div>`; st.className="status err"; st.textContent=errMsg(e); }
