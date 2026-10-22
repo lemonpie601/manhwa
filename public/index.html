@@ -406,6 +406,9 @@ select.enh{position:absolute;opacity:0;pointer-events:none;width:1px;height:1px}
 .origbar .olabel{font-weight:700;color:var(--ink-2)}
 .origbar .onote{flex-basis:100%;line-height:1.5}
 @media (max-width:640px){.origbar{margin-inline:16px}}
+.modelgrp{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:10px;padding:3px 3px 3px 3px;background:var(--panel)}
+.modelgrp .btn{border:0;padding:6px 10px}
+.modelgrp .seg.mini{border:0;background:var(--sunk)}
 .quotebar{display:flex;gap:8px;align-items:flex-start;background:var(--accent-soft);border-left:3px solid var(--accent);border-radius:0 10px 10px 0;padding:8px 10px}
 .quotebar > div{flex:1;min-width:0}
 .quotebar .qlabel{font-size:.74rem;font-weight:700;color:var(--accent)}
@@ -562,7 +565,8 @@ textarea::placeholder{color:var(--ink-3)}
       <label for="esA" class="lbl" style="margin-top:18px">내 답</label>
       <textarea id="esA" placeholder="여기에 답을 쓰세요. 금지어 없이, 근거 등급 붙이고, 비교면 마침 문장까지." style="min-height:220px;margin-top:6px"></textarea>
       <div class="counter" id="esCount">0자</div>
-      <div class="row" style="margin-top:16px"><button class="btn pri" id="esBtn">채점받기</button><button class="btn" id="esModel">모범답안 보기</button></div>
+      <div class="row" style="margin-top:16px;align-items:center"><button class="btn pri" id="esBtn">채점받기</button>
+        <div class="modelgrp"><button class="btn" id="esModel">모범답안 보기</button><div class="seg mini" id="esLen" role="group" aria-label="모범답안 길이"><button data-n="1">1줄</button><button data-n="2">2줄</button><button data-n="3">3줄</button></div></div></div>
       <div class="status" id="esStatus"></div>
       <div id="esOut"></div>
     </div>
@@ -1725,9 +1729,9 @@ ${ctx}
 문제: ${q}
 
 한국어로 시험지에 바로 옮겨 쓸 수 있는 길이로:
-- 본문은 2~3문장, 공백 포함 200자 이내. 서론·배경 설명·예시 나열 없이 문제가 묻는 것만.
+- 본문은 정확히 ${esLines}문장, 공백 포함 ${[0,80,150,220][esLines]}자 이내. 문장마다 줄을 바꾼다. 서론·배경 설명·예시 나열 없이 문제가 묻는 것만.
 - 핵심 키워드는 **굵게**. 근거 등급은 꼭 필요한 곳 한두 군데만 (확인)/(기록)/(해석) 표시.
-- 비교 문제면 마지막 문장을 마침 문장으로.
+${esLines>1?"- 비교 문제면 마지막 문장을 마침 문장으로.":"- 1문장이므로 마침 문장은 생략."}
 - 본문 뒤에 줄을 바꿔 '외울 키워드:' 한 줄 (키워드 3개).
 - 소제목, 목록, 인사, 덧붙이는 설명 금지.`;
   $("#esBtn").disabled=$("#esModel").disabled=true; st.className="status"; st.innerHTML=`<span class="dots">${mode==="grade"?"채점 중":"모범답안 쓰는 중"}</span>`; out.innerHTML="";
@@ -1735,6 +1739,10 @@ ${ctx}
   catch(e){ if(e.text) out.innerHTML=`<div class="aiout" style="margin-top:12px">${md(e.text)}</div>`; st.className="status err"; st.textContent=errMsg(e); }
   $("#esBtn").disabled=$("#esModel").disabled=false;
 }
+let esLines = +store.get("esLines",2);
+function renderEsLen(){ document.querySelectorAll("#esLen button").forEach(b=>b.setAttribute("aria-pressed",+b.dataset.n===esLines)); }
+document.querySelectorAll("#esLen button").forEach(b=>b.onclick=()=>{ esLines=+b.dataset.n; store.set("esLines",esLines); renderEsLen(); });
+renderEsLen();
 $("#esBtn").onclick=()=>essayCall("grade");
 $("#esModel").onclick=()=>essayCall("model");
 
